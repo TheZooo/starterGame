@@ -1,5 +1,5 @@
-var w = window.innerWidth; //window width subtracted by border size
-var h = window.innerHeight; //window height subtracted by border size
+var w = window.innerWidth; //window width
+var h = window.innerHeight; //window height
 var ballA = new ballA(); //creates global object ballA
 var ballB = new ballB(); //creates global object ballB
 var ballSizeA = 30; //Global ballA size
@@ -33,7 +33,7 @@ function draw() {
   ballA.move();
   ballB.show();
   ballB.move();
-  document.getElementById('dis').innerHTML = "Distance of line: " + d + " ..." + " Controls: Player1: WASD and shift ... Player2: IJKL and space";
+  document.getElementById('dis').innerHTML = "Distance of line: " + d + " :::" + " Controls: Player1: WASD and shift ::: Player2: IJKL and space";
   document.getElementById('playA').innerHTML = "Player1 stamina: " + stamA;
   document.getElementById('playB').innerHTML = "Player2 stamina: " + stamB;
 }
