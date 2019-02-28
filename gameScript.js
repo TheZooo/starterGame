@@ -1,7 +1,12 @@
 var w = window.innerWidth; //window width
 var h = window.innerHeight; //window height
+
 var ballA = new ballA(); //creates global object ballA
 var ballB = new ballB(); //creates global object ballB
+
+var powerA = new powerA(); //MORE OBJECTS
+var powerB = new powerB(); //MORE OBJECTS
+
 var ballSizeA = 30; //Global ballA size
 var ballSizeB = 30; //Global ballB size
 var baseBallSpeedA = 5; //To reset speedA
@@ -14,28 +19,73 @@ var ballSpeedB = baseBallSpeedB; //Set speed of ballB
 var ballSprintB = 8; //Sprint speed
 var stamB = 80; //Stamina for sprinting
 var stamMaxB = 60; //Max staminaB
+var staminaBalance = 5; //Punishes spamming the shift key
+
 var d; //Distance
+
+var powerSize = 20;
+var powerOneAct = false;
+var dPowerAA;
+var dPowerAB;
+var powerOneAppear;
+
+var powerTwoAct = false;
+var dPowerBA;
+var dPowerBB;
+var powerTwoAppear;
+
+var time = 60; //Timer set to avoid
+var triggerTime = time - 8; //Used in draw function
+var timerInterval = setInterval(winCondition, 1000); //Timer decrements by 1 second
+
 var tacked = ["BOPPED", "TACKLED", "TRAMPLED", "DOMINATED", "CAUGHT", "PUNCHED"]; //Wow
+var winned = ["AVOIDED", "JUKED", "WINNER", "DITCHED", "LAPPED", "DODGED"]; //Wow
 
 function setup() {
   createCanvas(w, h);
+  document.getElementById('disTime').innerHTML = time;
+  var limitTime = time - 25;
+  powerOneAppear = Math.floor(Math.random() * limitTime) + 20;
+  powerTwoAppear = Math.floor(Math.random() * limitTime) + 20;
 }
 
 function draw() {
   background(220);
-  line(ballA.x,ballA.y,ballB.x,ballB.y);
   d = Math.floor(dist(ballA.x,ballA.y,ballB.x,ballB.y));
   if (d < ballSizeA) {
     collision();
     noLoop();
   }
+  if (time < powerOneAppear && powerOneAct === false) {
+    powerA.show();
+    dPowerAA = Math.floor(dist(ballA.x,ballA.y,powerA.x,powerA.y));
+    dPowerAB = Math.floor(dist(ballB.x,ballB.y,powerA.x,powerA.y));
+  }
+  if (time < powerTwoAppear && powerTwoAct === false) {
+    powerB.show();
+    dPowerBA = Math.floor(dist(ballA.x,ballA.y,powerB.x,powerB.y));
+    dPowerBB = Math.floor(dist(ballB.x,ballB.y,powerB.x,powerB.y));
+  }
+  
   ballA.show();
   ballA.move();
   ballB.show();
   ballB.move();
-  document.getElementById('dis').innerHTML = "Distance of line: " + d + " :::" + " Controls: Player1: WASD and shift ::: Player2: IJKL and space";
+  
+  var x = w - (ballSizeA * 2);
+  var y = h - (ballSizeA * 2);
+  strokeWeight(2);
+  noFill();
+  rect(ballSizeA,ballSizeA,x,y);
+  
+  if (time > triggerTime) {
+    document.getElementById('dis').innerHTML = "Distance between Players: " + d + " :::" + " Controls: Player1: WASD and shift ::: Player2: IJKL and space";
+  } else {
+    document.getElementById('dis').innerHTML = "Distance between Players: " + d;
+  }
   document.getElementById('playA').innerHTML = "Player1 stamina: " + stamA;
   document.getElementById('playB').innerHTML = "Player2 stamina: " + stamB;
+  document.getElementById('dump').innerHTML = powerOneAct + " " + dPowerAA + " " + dPowerAB + " " + powerOneAppear;
 }
 
 function ballA() { //Global object "ball"
@@ -64,12 +114,15 @@ function ballA() { //Global object "ball"
         ballSpeedA = ballSprintA;
       }
     } else {
-      if (stamA < stamMaxA) {
+      if (stamA < stamMaxA) { //Regenerate StamA
         stamA++;
       }
     }
-    if (stamA === 0) {
+    if (stamA === 0) { //Resets the speed if stamina runs out
       ballSpeedA = baseBallSpeedA;
+    }
+    if (stamA < 0) {
+      stamA = 0;
     }
     if (this.x < ballSizeA) { //Border Left
       this.x = ballSizeA;
@@ -85,8 +138,8 @@ function ballA() { //Global object "ball"
 }
 
 function ballB() { //Player 2 ballB()
-  this.x = w;
-  this.y = h;
+  this.x = w - 50;
+  this.y = h - 50;
   this.show = function() {
     fill(color('blue'));
     ellipse(this.x,this.y,ballSizeB,ballSizeB);
@@ -104,18 +157,21 @@ function ballB() { //Player 2 ballB()
     if (keyIsDown(75)) { //Down
       this.y += ballSpeedB;
     }
-    if (keyIsDown(32)) {
+    if (keyIsDown(32)) { //Speed up for B
       if (stamB > 0) {
         stamB--;
         ballSpeedB = ballSprintB;
       }
     } else {
-      if (stamB < stamMaxB) {
+      if (stamB < stamMaxB) { //Regenerate StamA
         stamB++;
       }
     }
-    if (stamB === 0) {
+    if (stamB === 0) { //Resets the speed if stamina runs out
       ballSpeedB = baseBallSpeedB;
+    }
+    if (stamB < 0) {
+      stamB = 0;
     }
     if (this.x < ballSizeB) { //Border Left
       this.x = ballSizeB;
@@ -130,8 +186,49 @@ function ballB() { //Player 2 ballB()
   };
 }
 
-function collision() {
+function powerA() {
+  var randX = Math.floor(Math.random() * w - powerSize);
+  var randY = Math.floor(Math.random() * h - powerSize);
+  this.x = randX;
+  this.y = randY;
+  this.show = function() {
+    fill(color('yellow'));
+    ellipse(this.x,this.y,powerSize,powerSize);
+  };
+}
+
+function powerB() {
+  var randX = Math.floor(Math.random() * w - powerSize);
+  var randY = Math.floor(Math.random() * h - powerSize);
+  this.x = randX;
+  this.y = randY;
+  this.show = function() {
+    fill(color('green'));
+    ellipse(this.x,this.y,powerSize,powerSize);
+  };
+}
+
+function keyPressed() {
+  if (keyCode == "16") {
+    stamA -= staminaBalance;
+  }
+  if (keyCode == "32") {
+    stamB -= staminaBalance;
+  }
+}
+
+function collision() { //When the two player collide
   var rand = Math.floor(Math.random() * tacked.length);
-  window.alert(tacked[rand]);
+  window.alert(tacked[rand] + " -P2 win");
   location.href = "starterGame.html";
+}
+
+function winCondition() { //When the player is able to avoid the opponent
+  var rand = Math.floor(Math.random() * winned.length);
+  time--;
+  document.getElementById('disTime').innerHTML = time;
+  if (time === 0) {
+    window.alert(winned[rand] + " -P1 win");
+    location.href = "starterGame.html";
+  }
 }
