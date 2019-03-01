@@ -91,6 +91,7 @@ function draw() {
 
 function start() {
   beginCheck = true;
+  document.getElementById('bttn').style.visibility = "hidden";
 }
 
 function ballA() { //Global object "ball"
@@ -224,13 +225,14 @@ function powerB() {
 function keyPressed() {
   if (beginCheck === true) {
     if (keyCode == "16") {
-      stamA -= staminaBalance;
-    }
+        stamA -= staminaBalance;
+      }
     if (keyCode == "32") {
-    stamB -= staminaBalance;
+      stamB -= staminaBalance;
+    }
+  } else if (keyCode == "13" && beginCheck === false) {
+    start();
   }
-  }
-  
 }
 
 function collision() { //When the two player collide
@@ -241,8 +243,10 @@ function collision() { //When the two player collide
 
 function winCondition() { //When the player is able to avoid the opponent
   var rand = Math.floor(Math.random() * winned.length);
-  time--;
-  document.getElementById('disTime').innerHTML = time;
+  if (beginCheck === true) {
+    time--;
+    document.getElementById('disTime').innerHTML = time;
+  }
   if (time === 0) {
     window.alert(winned[rand] + " -P1 win");
     location.href = "starterGame.html";
