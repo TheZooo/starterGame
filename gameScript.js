@@ -34,6 +34,7 @@ var dPowerBA;
 var dPowerBB;
 var powerTwoAppear;
 
+var beginCheck = false;
 var time = 60; //Timer set to avoid
 var triggerTime = time - 8; //Used in draw function
 var timerInterval = setInterval(winCondition, 1000); //Timer decrements by 1 second
@@ -88,6 +89,10 @@ function draw() {
   document.getElementById('dump').innerHTML = powerOneAct + " " + dPowerAA + " " + dPowerAB + " " + powerOneAppear;
 }
 
+function start() {
+  beginCheck = true;
+}
+
 function ballA() { //Global object "ball"
   this.x = 50;
   this.y = 50;
@@ -96,45 +101,47 @@ function ballA() { //Global object "ball"
     ellipse(this.x,this.y,ballSizeA,ballSizeA);
   };
   this.move = function() { //Created function "ballA.move()"
-    if (keyIsDown(65)) { //Left
-      this.x -= ballSpeedA;
-    }
-    if (keyIsDown(68)) { //Right
-      this.x += ballSpeedA;
-    }
-    if (keyIsDown(87)) { //Up
-      this.y -= ballSpeedA;
-    }
-    if (keyIsDown(83)) { //Down
-      this.y += ballSpeedA;
-    }
-    if (keyIsDown(16)) { //Speed up for A
-      if (stamA > 0) {
-        stamA--;
-        ballSpeedA = ballSprintA;
+    if (beginCheck === true) {
+      if (keyIsDown(65)) { //Left
+        this.x -= ballSpeedA;
       }
-    } else {
-      if (stamA < stamMaxA) { //Regenerate StamA
-        stamA++;
+      if (keyIsDown(68)) { //Right
+        this.x += ballSpeedA;
+      }
+      if (keyIsDown(87)) { //Up
+        this.y -= ballSpeedA;
+      }
+      if (keyIsDown(83)) { //Down
+        this.y += ballSpeedA;
+      }
+      if (keyIsDown(16)) { //Speed up for A
+        if (stamA > 0) {
+          stamA--;
+          ballSpeedA = ballSprintA;
+        }
+      } else {
+        if (stamA < stamMaxA) { //Regenerate StamA
+          stamA++;
+        }
+      }
+      if (stamA === 0) { //Resets the speed if stamina runs out
+        ballSpeedA = baseBallSpeedA;
+      }
+      if (stamA < 0) {
+        stamA = 0;
       }
     }
-    if (stamA === 0) { //Resets the speed if stamina runs out
-      ballSpeedA = baseBallSpeedA;
-    }
-    if (stamA < 0) {
-      stamA = 0;
-    }
-    if (this.x < ballSizeA) { //Border Left
-      this.x = ballSizeA;
-    } else if (this.x > w - ballSizeA) { //Border Right
-      this.x = w - ballSizeA;
-    }
-    if (this.y < ballSizeA) { //Border Up
-      this.y = ballSizeA;
-    } else if (this.y > h - ballSizeA) { //Border Down
-      this.y = h - ballSizeA;
-    }
-  };
+      if (this.x < ballSizeA) { //Border Left
+        this.x = ballSizeA;
+      } else if (this.x > w - ballSizeA) { //Border Right
+        this.x = w - ballSizeA;
+      }
+      if (this.y < ballSizeA) { //Border Up
+        this.y = ballSizeA;
+      } else if (this.y > h - ballSizeA) { //Border Down
+        this.y = h - ballSizeA;
+      }
+    };
 }
 
 function ballB() { //Player 2 ballB()
@@ -145,33 +152,35 @@ function ballB() { //Player 2 ballB()
     ellipse(this.x,this.y,ballSizeB,ballSizeB);
   };
   this.move = function() {
-    if (keyIsDown(74)) { //Left
-      this.x -= ballSpeedB;
-    }
-    if (keyIsDown(76)) { //Right
-      this.x += ballSpeedB;
-    }
-    if (keyIsDown(73)) { //Up
-      this.y -= ballSpeedB;
-    }
-    if (keyIsDown(75)) { //Down
-      this.y += ballSpeedB;
-    }
-    if (keyIsDown(32)) { //Speed up for B
-      if (stamB > 0) {
-        stamB--;
-        ballSpeedB = ballSprintB;
+    if (beginCheck === true) {
+      if (keyIsDown(74)) { //Left
+        this.x -= ballSpeedB;
       }
-    } else {
-      if (stamB < stamMaxB) { //Regenerate StamA
-        stamB++;
+      if (keyIsDown(76)) { //Right
+        this.x += ballSpeedB;
       }
-    }
-    if (stamB === 0) { //Resets the speed if stamina runs out
-      ballSpeedB = baseBallSpeedB;
-    }
-    if (stamB < 0) {
-      stamB = 0;
+      if (keyIsDown(73)) { //Up
+        this.y -= ballSpeedB;
+      }
+      if (keyIsDown(75)) { //Down
+        this.y += ballSpeedB;
+      }
+      if (keyIsDown(32)) { //Speed up for B
+        if (stamB > 0) {
+          stamB--;
+          ballSpeedB = ballSprintB;
+        }
+      } else {
+        if (stamB < stamMaxB) { //Regenerate StamA
+          stamB++;
+        }
+      }
+      if (stamB === 0) { //Resets the speed if stamina runs out
+        ballSpeedB = baseBallSpeedB;
+      }
+      if (stamB < 0) {
+        stamB = 0;
+      }
     }
     if (this.x < ballSizeB) { //Border Left
       this.x = ballSizeB;
@@ -187,8 +196,10 @@ function ballB() { //Player 2 ballB()
 }
 
 function powerA() {
-  var randX = Math.floor(Math.random() * w - powerSize);
-  var randY = Math.floor(Math.random() * h - powerSize);
+  var compactX = w - powerSize;
+  var compactY = h - powerSize;
+  var randX = Math.floor(Math.random() * compactX);
+  var randY = Math.floor(Math.random() * compactY);
   this.x = randX;
   this.y = randY;
   this.show = function() {
@@ -198,8 +209,10 @@ function powerA() {
 }
 
 function powerB() {
-  var randX = Math.floor(Math.random() * w - powerSize);
-  var randY = Math.floor(Math.random() * h - powerSize);
+  var compactX = w - powerSize;
+  var compactY = h - powerSize;
+  var randX = Math.floor(Math.random() * compactX);
+  var randY = Math.floor(Math.random() * compactY);
   this.x = randX;
   this.y = randY;
   this.show = function() {
@@ -209,12 +222,15 @@ function powerB() {
 }
 
 function keyPressed() {
-  if (keyCode == "16") {
-    stamA -= staminaBalance;
-  }
-  if (keyCode == "32") {
+  if (beginCheck === true) {
+    if (keyCode == "16") {
+      stamA -= staminaBalance;
+    }
+    if (keyCode == "32") {
     stamB -= staminaBalance;
   }
+  }
+  
 }
 
 function collision() { //When the two player collide
