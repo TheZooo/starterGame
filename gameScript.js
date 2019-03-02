@@ -127,7 +127,6 @@ function draw() {
   }
   document.getElementById('playA').innerHTML = "Player1 stamina: " + stamA;
   document.getElementById('playB').innerHTML = "Player2 stamina: " + stamB;
-  console.log(ii);
 }
 
 function start() {
