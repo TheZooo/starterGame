@@ -1,42 +1,48 @@
 <html>
 
 <head>
-    <script src="p5/p5.min.js"></script>
-    <script src="gameScript.js"></script>
-    <style>
-        body{
-            overflow: hidden;
-        }
-        
-        canvas {
-            position: absolute;
-            left: 0;
-            top: 0;
-            z-index:-1;
-        }
-        
-        #dis {
-          position:absolute;
-        }
-        
-        #playA {
-          position:absolute;
-          top:30px;
-          left:50px;
-        }
-        
-        #playB {
-          position:absolute;
-          top:30px;
-          right:50px;
-        }
-        
-        #disTime {
-          position:absolute;
-          top:10px;
-          left:50vw;
-        }
-    </style>
+  <script src="p5/p5.min.js"></script>
+  <script src="gameScript.js"></script>
+  <style>
+    body {
+      overflow: hidden;
+    }
+
+    canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: -1;
+    }
+
+    #bttn {
+      position: absolute;
+      left: 49vw;
+      top: 80px;
+    }
+
+    #dis {
+      position: absolute;
+    }
+
+    #playA {
+      position: absolute;
+      top: 30px;
+      left: 50px;
+    }
+
+    #playB {
+      position: absolute;
+      top: 30px;
+      right: 50px;
+    }
+
+    #disTime {
+      position: absolute;
+      top: 10px;
+      left: 50vw;
+    }
+  </style>
 </head>
 
 <body>
@@ -44,7 +50,7 @@
   <span id="dis"></span>
   <p id="playA"></p>
   <p id="playB"></p>
-  <h2 id="dump"></h2>
+  <button id="bttn" onclick="start()">BEGIN</button>
 </body>
 
 </html>
