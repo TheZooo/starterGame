@@ -1,38 +1,45 @@
 var w = window.innerWidth; //window width
 var h = window.innerHeight; //window height
 
-var ballA = new ballA(); //creates global object ballA
-var ballB = new ballB(); //creates global object ballB
-
-var powerA = new powerA(); //MORE OBJECTS
-var powerB = new powerB(); //MORE OBJECTS
-
-var ballSizeA = 30; //Global ballA size
-var ballSizeB = 30; //Global ballB size
-var baseBallSpeedA = 5; //To reset speedA
+var ballSize = 30; //Simplicity
+var baseBallSpeed = 5; //Simplicity
+var ballSizeA = ballSize; //Global ballA size
+var ballSizeB = ballSize; //Global ballB size
+var baseBallSpeedA = baseBallSpeed; //To reset speedA
 var ballSpeedA = baseBallSpeedA; //Set speed of ballA
-var ballSprintA = 8; //Sprint speed
-var stamA = 80; //Stamina for sprinting
-var stamMaxA = 60; //Max staminaA
-var baseBallSpeedB = 5; //To reset speedB
+var ballSprintA = ballSpeedA + 3; //Sprint speed
+var stamA = 100; //Stamina for sprinting
+var stamMaxA = 80; //Max staminaA
+var baseBallSpeedB = baseBallSpeed; //To reset speedB
 var ballSpeedB = baseBallSpeedB; //Set speed of ballB
-var ballSprintB = 8; //Sprint speed
-var stamB = 80; //Stamina for sprinting
-var stamMaxB = 60; //Max staminaB
+var ballSprintB = ballSpeedB + 3; //Sprint speed
+var stamB = 100; //Stamina for sprinting
+var stamMaxB = 80; //Max staminaB
 var staminaBalance = 5; //Punishes spamming the shift key
 
 var d; //Distance
 
 var powerSize = 20;
-var powerOneAct = false;
+
+var powerOneAct = true;
 var dPowerAA;
 var dPowerAB;
 var powerOneAppear;
+var i = 240;
 
-var powerTwoAct = false;
+var powerTwoAct = true;
 var dPowerBA;
 var dPowerBB;
 var powerTwoAppear;
+var ii = 10;
+var stopperA = false;
+var stopperB = false;
+
+var ballA = new ballA(); //creates global object ballA
+var ballB = new ballB(); //creates global object ballB
+
+var powerA = new powerA(); //MORE OBJECTS
+var powerB = new powerB(); //MORE OBJECTS
 
 var beginCheck = false;
 var time = 60; //Timer set to avoid
@@ -46,39 +53,73 @@ function setup() {
   createCanvas(w, h);
   document.getElementById('disTime').innerHTML = time;
   var limitTime = time - 25;
-  powerOneAppear = Math.floor(Math.random() * limitTime) + 20;
-  powerTwoAppear = Math.floor(Math.random() * limitTime) + 20;
+  powerOneAppear = Math.floor((Math.random() * limitTime) + 20);
+  powerTwoAppear = Math.floor((Math.random() * limitTime) + 20);
 }
 
 function draw() {
   background(220);
-  d = Math.floor(dist(ballA.x,ballA.y,ballB.x,ballB.y));
+  d = Math.floor(dist(ballA.x, ballA.y, ballB.x, ballB.y));
   if (d < ballSizeA) {
     collision();
     noLoop();
   }
-  if (time < powerOneAppear && powerOneAct === false) {
-    powerA.show();
-    dPowerAA = Math.floor(dist(ballA.x,ballA.y,powerA.x,powerA.y));
-    dPowerAB = Math.floor(dist(ballB.x,ballB.y,powerA.x,powerA.y));
-  }
-  if (time < powerTwoAppear && powerTwoAct === false) {
-    powerB.show();
-    dPowerBA = Math.floor(dist(ballA.x,ballA.y,powerB.x,powerB.y));
-    dPowerBB = Math.floor(dist(ballB.x,ballB.y,powerB.x,powerB.y));
-  }
-  
   ballA.show();
   ballA.move();
   ballB.show();
   ballB.move();
   
+  if (time < powerOneAppear && powerOneAct === true) {
+    powerA.show();
+    dPowerAA = Math.floor(dist(ballA.x, ballA.y, powerA.x, powerA.y));
+    dPowerAB = Math.floor(dist(ballB.x, ballB.y, powerA.x, powerA.y));
+  } if (dPowerAA < powerSize) {
+    if (i !== 0) {
+      i--;
+      powerA.workA();
+    }
+    powerOneAct = false;
+  } else if (dPowerAB < powerSize) {
+    if (i !== 0) {
+      i--;
+      powerA.workB();
+    }
+    powerOneAct = false;
+  }
+  if (i === 0) {
+    baseBallSpeedA = baseBallSpeed;
+    baseBallSpeedB = baseBallSpeed;
+    ballSpeedA = baseBallSpeedA;
+    ballSpeedB = baseBallSpeedB;
+    ballSprintA = ballSpeedA + 3;
+    ballSprintB = ballSpeedB + 3;
+    i--;
+  }
+  if (time < powerTwoAppear && powerTwoAct === true) {
+    powerB.show();
+    dPowerBA = Math.floor(dist(ballA.x, ballA.y, powerB.x, powerB.y));
+    dPowerBB = Math.floor(dist(ballB.x, ballB.y, powerB.x, powerB.y));
+  } if (dPowerBA < powerSize) {
+    if (ii !== 0) {
+      powerB.workA();
+    }
+    powerTwoAct = false;
+  } else if (dPowerBB < powerSize) {
+    if (ii !== 0) {
+      powerB.workB();
+    }
+    powerTwoAct = false;
+  }
+  if (ii === 0) {
+    stopperA = false;
+    stopperB = false;
+  }
   var x = w - (ballSizeA * 2);
   var y = h - (ballSizeA * 2);
+  stroke(0);
   strokeWeight(2);
   noFill();
-  rect(ballSizeA,ballSizeA,x,y);
-  
+  rect(ballSizeA, ballSizeA, x, y);
   if (time > triggerTime) {
     document.getElementById('dis').innerHTML = "Distance between Players: " + d + " :::" + " Controls: Player1: WASD and shift ::: Player2: IJKL and space";
   } else {
@@ -86,23 +127,24 @@ function draw() {
   }
   document.getElementById('playA').innerHTML = "Player1 stamina: " + stamA;
   document.getElementById('playB').innerHTML = "Player2 stamina: " + stamB;
-  document.getElementById('dump').innerHTML = powerOneAct + " " + dPowerAA + " " + dPowerAB + " " + powerOneAppear;
+  console.log(ii);
 }
 
 function start() {
   beginCheck = true;
-  document.getElementById('bttn').style.visibility = "hidden";
+  document.getElementById('bttn').style.display = "none";
 }
 
 function ballA() { //Global object "ball"
   this.x = 50;
   this.y = 50;
-  this.show = function() { //Created function "ballA.show()"
-    fill(color('red'));
-    ellipse(this.x,this.y,ballSizeA,ballSizeA);
+  this.show = function () { //Created function "ballA.show()"
+    stroke(0);
+    fill(255, 0, 0);
+    ellipse(this.x, this.y, ballSizeA, ballSizeA);
   };
-  this.move = function() { //Created function "ballA.move()"
-    if (beginCheck === true) {
+  this.move = function () { //Created function "ballA.move()"
+    if (beginCheck === true || stopperA === false) {
       if (keyIsDown(65)) { //Left
         this.x -= ballSpeedA;
       }
@@ -124,6 +166,7 @@ function ballA() { //Global object "ball"
         if (stamA < stamMaxA) { //Regenerate StamA
           stamA++;
         }
+        ballSpeedA = baseBallSpeedA;
       }
       if (stamA === 0) { //Resets the speed if stamina runs out
         ballSpeedA = baseBallSpeedA;
@@ -132,28 +175,29 @@ function ballA() { //Global object "ball"
         stamA = 0;
       }
     }
-      if (this.x < ballSizeA) { //Border Left
-        this.x = ballSizeA;
-      } else if (this.x > w - ballSizeA) { //Border Right
-        this.x = w - ballSizeA;
-      }
-      if (this.y < ballSizeA) { //Border Up
-        this.y = ballSizeA;
-      } else if (this.y > h - ballSizeA) { //Border Down
-        this.y = h - ballSizeA;
-      }
-    };
+    if (this.x < ballSizeA) { //Border Left
+      this.x = ballSizeA;
+    } else if (this.x > w - ballSizeA) { //Border Right
+      this.x = w - ballSizeA;
+    }
+    if (this.y < ballSizeA) { //Border Up
+      this.y = ballSizeA;
+    } else if (this.y > h - ballSizeA) { //Border Down
+      this.y = h - ballSizeA;
+    }
+  };
 }
 
 function ballB() { //Player 2 ballB()
   this.x = w - 50;
   this.y = h - 50;
-  this.show = function() {
-    fill(color('blue'));
-    ellipse(this.x,this.y,ballSizeB,ballSizeB);
+  this.show = function () {
+    stroke(0);
+    fill(0, 97, 255);
+    ellipse(this.x, this.y, ballSizeB, ballSizeB);
   };
-  this.move = function() {
-    if (beginCheck === true) {
+  this.move = function () {
+    if (beginCheck === true || stopperB === false) {
       if (keyIsDown(74)) { //Left
         this.x -= ballSpeedB;
       }
@@ -175,6 +219,7 @@ function ballB() { //Player 2 ballB()
         if (stamB < stamMaxB) { //Regenerate StamA
           stamB++;
         }
+        ballSpeedB = baseBallSpeedB;
       }
       if (stamB === 0) { //Resets the speed if stamina runs out
         ballSpeedB = baseBallSpeedB;
@@ -197,36 +242,100 @@ function ballB() { //Player 2 ballB()
 }
 
 function powerA() {
-  var compactX = w - powerSize;
-  var compactY = h - powerSize;
-  var randX = Math.floor(Math.random() * compactX);
-  var randY = Math.floor(Math.random() * compactY);
-  this.x = randX;
-  this.y = randY;
-  this.show = function() {
-    fill(color('yellow'));
-    ellipse(this.x,this.y,powerSize,powerSize);
+  this.x = Math.floor(Math.random() * w - ballSize) + ballSize;
+  this.y = Math.floor(Math.random() * h - ballSize) + ballSize;
+  if (this.x < ballSize) { //Border Left
+    this.x = ballSize;
+  } else if (this.x > w - ballSize) { //Border Right
+    this.x = w - ballSize;
+  }
+  if (this.y < ballSize) { //Border Up
+    this.y = ballSize;
+  } else if (this.y > h - ballSize) { //Border Down
+    this.y = h - ballSize;
+  }
+  this.show = function () {
+    fill(255, 255, 0);
+    stroke(0);
+    ellipse(this.x, this.y, powerSize, powerSize);
+  };
+  this.workA = function () {
+    this.x = ballA.x;
+    this.y = ballA.y;
+    noFill();
+    stroke(255, 255, 0);
+    ellipse(this.x,this.y,ballSize+10,ballSize+10);
+    if (i !== 0) {
+      baseBallSpeedA = 10;
+      ballSpeedA = baseBallSpeedA;
+      ballSprintA = ballSpeedA + 3;
+    }
+  };
+  this.workB = function () {
+    this.x = ballB.x;
+    this.y = ballB.y;
+    noFill();
+    stroke(255, 255, 0);
+    ellipse(this.x,this.y,ballSize+10,ballSize+10);
+    if (i !== 0) {
+      baseBallSpeedB = 10;
+      ballSpeedB = baseBallSpeedB;
+      ballSprintB = ballSpeedB + 3;
+    }
   };
 }
 
 function powerB() {
-  var compactX = w - powerSize;
-  var compactY = h - powerSize;
-  var randX = Math.floor(Math.random() * compactX);
-  var randY = Math.floor(Math.random() * compactY);
-  this.x = randX;
-  this.y = randY;
-  this.show = function() {
-    fill(color('green'));
-    ellipse(this.x,this.y,powerSize,powerSize);
+  this.x = Math.floor(Math.random() * w - ballSize) + ballSize;
+  this.y = Math.floor(Math.random() * h - ballSize) + ballSize;
+  if (this.x < ballSize) { //Border Left
+    this.x = ballSize;
+  } else if (this.x > w - ballSize) { //Border Right
+    this.x = w - ballSize;
+  }
+  if (this.y < ballSize) { //Border Up
+    this.y = ballSize;
+  } else if (this.y > h - ballSize) { //Border Down
+    this.y = h - ballSize;
+  }
+  this.show = function () {
+    fill(55, 255, 65);
+    stroke(0);
+    ellipse(this.x, this.y, powerSize, powerSize);
+  };
+  this.workA = function () {
+    this.x = ballA.x;
+    this.y = ballA.y;
+    if (ii !== 0) {
+      noFill();
+      stroke(55, 255, 65);
+      ellipse(this.x,this.y,ballSize+10,ballSize+10);
+      if (d < ballSize + 10) {
+        stopperB = true;
+        ii--;
+      }
+    }
+  };
+  this.workB = function () {
+    this.x = ballA.x;
+    this.y = ballA.y;
+    if (ii !== 0) {
+      noFill();
+      stroke(55, 255, 65);
+      ellipse(this.x,this.y,ballSize+10,ballSize+10);
+      if (d < ballSize + 10) {
+        stopperA = true;
+        ii--;
+      }
+    }
   };
 }
 
 function keyPressed() {
   if (beginCheck === true) {
     if (keyCode == "16") {
-        stamA -= staminaBalance;
-      }
+      stamA -= staminaBalance;
+    }
     if (keyCode == "32") {
       stamB -= staminaBalance;
     }
