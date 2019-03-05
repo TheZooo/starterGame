@@ -25,21 +25,14 @@ var powerOneAct = true;
 var dPowerAA;
 var dPowerAB;
 var powerOneAppear;
-var i = 240;
-
-var powerTwoAct = true;
-var dPowerBA;
-var dPowerBB;
-var powerTwoAppear;
-var ii = 10;
-var stopperA = false;
-var stopperB = false;
+var turboSpeed = 10;
+var intPowerDura = 240;
+var powerDura = intPowerDura;
 
 var ballA = new ballA(); //creates global object ballA
 var ballB = new ballB(); //creates global object ballB
 
 var powerA = new powerA(); //MORE OBJECTS
-var powerB = new powerB(); //MORE OBJECTS
 
 var beginCheck = false;
 var time = 60; //Timer set to avoid
@@ -54,7 +47,6 @@ function setup() {
   document.getElementById('disTime').innerHTML = time;
   var limitTime = time - 25;
   powerOneAppear = Math.floor((Math.random() * limitTime) + 20);
-  powerTwoAppear = Math.floor((Math.random() * limitTime) + 20);
 }
 
 function draw() {
@@ -64,6 +56,7 @@ function draw() {
     collision();
     noLoop();
   }
+  strokeWeight(1);
   ballA.show();
   ballA.move();
   ballB.show();
@@ -73,53 +66,37 @@ function draw() {
     powerA.show();
     dPowerAA = Math.floor(dist(ballA.x, ballA.y, powerA.x, powerA.y));
     dPowerAB = Math.floor(dist(ballB.x, ballB.y, powerA.x, powerA.y));
-  } if (dPowerAA < powerSize) {
-    if (i !== 0) {
-      i--;
+  }
+  if (dPowerAA < powerSize && powerDura > 0) {
+    if (powerDura !== 0) {
       powerA.workA();
+      powerDura--;
     }
     powerOneAct = false;
-  } else if (dPowerAB < powerSize) {
-    if (i !== 0) {
-      i--;
+  } else if (dPowerAB < powerSize && powerDura > 0) {
+    if (powerDura !== 0) {
       powerA.workB();
+      powerDura--;
     }
     powerOneAct = false;
-  }
-  if (i === 0) {
+  } else if (powerDura === 0) {
+    dPowerAA = "Bleh";
+    dPowerAB = "Bleh";
     baseBallSpeedA = baseBallSpeed;
-    baseBallSpeedB = baseBallSpeed;
     ballSpeedA = baseBallSpeedA;
-    ballSpeedB = baseBallSpeedB;
     ballSprintA = ballSpeedA + 3;
+    baseBallSpeedB = baseBallSpeed;
+    ballSpeedB = baseBallSpeedB;
     ballSprintB = ballSpeedB + 3;
-    i--;
+    powerDura--;
   }
-  if (time < powerTwoAppear && powerTwoAct === true) {
-    powerB.show();
-    dPowerBA = Math.floor(dist(ballA.x, ballA.y, powerB.x, powerB.y));
-    dPowerBB = Math.floor(dist(ballB.x, ballB.y, powerB.x, powerB.y));
-  } if (dPowerBA < powerSize) {
-    if (ii !== 0) {
-      powerB.workA();
-    }
-    powerTwoAct = false;
-  } else if (dPowerBB < powerSize) {
-    if (ii !== 0) {
-      powerB.workB();
-    }
-    powerTwoAct = false;
-  }
-  if (ii === 0) {
-    stopperA = false;
-    stopperB = false;
-  }
-  var x = w - (ballSizeA * 2);
-  var y = h - (ballSizeA * 2);
+  
+  var x = w - ballSize;
+  var y = h - ballSize;
   stroke(0);
   strokeWeight(2);
   noFill();
-  rect(ballSizeA, ballSizeA, x, y);
+  rect(ballSize/2, ballSize/2, x, y);
   if (time > triggerTime) {
     document.getElementById('dis').innerHTML = "Distance between Players: " + d + " :::" + " Controls: Player1: WASD and shift ::: Player2: IJKL and space";
   } else {
@@ -143,7 +120,7 @@ function ballA() { //Global object "ball"
     ellipse(this.x, this.y, ballSizeA, ballSizeA);
   };
   this.move = function () { //Created function "ballA.move()"
-    if (beginCheck === true || stopperA === false) {
+    if (beginCheck === true) {
       if (keyIsDown(65)) { //Left
         this.x -= ballSpeedA;
       }
@@ -196,7 +173,7 @@ function ballB() { //Player 2 ballB()
     ellipse(this.x, this.y, ballSizeB, ballSizeB);
   };
   this.move = function () {
-    if (beginCheck === true || stopperB === false) {
+    if (beginCheck === true) {
       if (keyIsDown(74)) { //Left
         this.x -= ballSpeedB;
       }
@@ -262,9 +239,10 @@ function powerA() {
     this.x = ballA.x;
     this.y = ballA.y;
     noFill();
+    strokeWeight(8);
     stroke(255, 255, 0);
     ellipse(this.x,this.y,ballSize+10,ballSize+10);
-    if (i !== 0) {
+    if (powerDura === intPowerDura) {
       baseBallSpeedA = 10;
       ballSpeedA = baseBallSpeedA;
       ballSprintA = ballSpeedA + 3;
@@ -274,58 +252,13 @@ function powerA() {
     this.x = ballB.x;
     this.y = ballB.y;
     noFill();
+    strokeWeight(8);
     stroke(255, 255, 0);
     ellipse(this.x,this.y,ballSize+10,ballSize+10);
-    if (i !== 0) {
+    if (powerDura === intPowerDura) {
       baseBallSpeedB = 10;
       ballSpeedB = baseBallSpeedB;
       ballSprintB = ballSpeedB + 3;
-    }
-  };
-}
-
-function powerB() {
-  this.x = Math.floor(Math.random() * w - ballSize) + ballSize;
-  this.y = Math.floor(Math.random() * h - ballSize) + ballSize;
-  if (this.x < ballSize) { //Border Left
-    this.x = ballSize;
-  } else if (this.x > w - ballSize) { //Border Right
-    this.x = w - ballSize;
-  }
-  if (this.y < ballSize) { //Border Up
-    this.y = ballSize;
-  } else if (this.y > h - ballSize) { //Border Down
-    this.y = h - ballSize;
-  }
-  this.show = function () {
-    fill(55, 255, 65);
-    stroke(0);
-    ellipse(this.x, this.y, powerSize, powerSize);
-  };
-  this.workA = function () {
-    this.x = ballA.x;
-    this.y = ballA.y;
-    if (ii !== 0) {
-      noFill();
-      stroke(55, 255, 65);
-      ellipse(this.x,this.y,ballSize+10,ballSize+10);
-      if (d < ballSize + 10) {
-        stopperB = true;
-        ii--;
-      }
-    }
-  };
-  this.workB = function () {
-    this.x = ballA.x;
-    this.y = ballA.y;
-    if (ii !== 0) {
-      noFill();
-      stroke(55, 255, 65);
-      ellipse(this.x,this.y,ballSize+10,ballSize+10);
-      if (d < ballSize + 10) {
-        stopperA = true;
-        ii--;
-      }
     }
   };
 }
