@@ -20,7 +20,6 @@ var staminaBalance = 5; //Punishes spamming the shift key
 var d; //Distance
 
 var powerSize = 20;
-
 var powerOneAct = true;
 var dPowerAA;
 var dPowerAB;
@@ -31,7 +30,6 @@ var powerDura = intPowerDura;
 
 var ballA = new ballA(); //creates global object ballA
 var ballB = new ballB(); //creates global object ballB
-
 var powerA = new powerA(); //MORE OBJECTS
 
 var beginCheck = false;
@@ -56,6 +54,7 @@ function draw() {
     collision();
     noLoop();
   }
+  
   strokeWeight(1);
   ballA.show();
   ballA.move();
